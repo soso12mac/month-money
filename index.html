@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#17705b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="家計簿">
+  <title>スマホ家計簿</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="app-icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">Mobile Budget</p>
+        <h1>家計簿</h1>
+      </div>
+      <label class="month-picker">
+        <span>表示月</span>
+        <input type="month" id="filterMonth">
+      </label>
+    </header>
+
+    <section class="input-panel" aria-labelledby="entryTitle">
+      <div class="section-heading">
+        <h2 id="entryTitle">記録する</h2>
+        <button type="button" class="ghost-button" id="resetFormButton">新規</button>
+      </div>
+
+      <form id="entryForm" class="entry-form">
+        <input type="hidden" id="editingId">
+
+        <div class="field-row two-columns">
+          <label>
+            <span>日付</span>
+            <input type="date" id="entryDate" required>
+          </label>
+
+          <label>
+            <span>種別</span>
+            <select id="entryType" required>
+              <option value="expense">支出</option>
+              <option value="income">収入</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="field-row two-columns">
+          <label>
+            <span>金額</span>
+            <input type="number" id="entryAmount" inputmode="numeric" min="1" step="1" placeholder="1200" required>
+          </label>
+
+          <label>
+            <span>カテゴリ</span>
+            <select id="entryCategory" required></select>
+          </label>
+        </div>
+
+        <label>
+          <span>メモ</span>
+          <input type="text" id="entryMemo" maxlength="40" placeholder="スーパー、電車代など">
+        </label>
+
+        <button type="submit" class="primary-button" id="submitButton">登録する</button>
+      </form>
+    </section>
+
+    <section class="budget-panel" aria-labelledby="budgetTitle">
+      <div class="section-heading">
+        <h2 id="budgetTitle">月予算</h2>
+        <span class="small-text">表示月ごとに保存</span>
+      </div>
+
+      <div class="budget-form">
+        <label>
+          <span>予算額</span>
+          <input type="number" id="monthlyBudget" inputmode="numeric" min="0" step="1" placeholder="100000">
+        </label>
+        <button type="button" class="secondary-button" id="saveBudgetButton">保存</button>
+      </div>
+    </section>
+
+    <section class="fixed-panel" aria-labelledby="fixedTitle">
+      <div class="section-heading">
+        <h2 id="fixedTitle">固定費</h2>
+        <button type="button" class="ghost-button" id="resetFixedButton">新規</button>
+      </div>
+
+      <form id="fixedCostForm" class="fixed-form">
+        <input type="hidden" id="editingFixedId">
+
+        <div class="field-row two-columns">
+          <label>
+            <span>項目名</span>
+            <input type="text" id="fixedName" maxlength="24" placeholder="家賃、サブスクなど" required>
+          </label>
+
+          <label>
+            <span>金額</span>
+            <input type="number" id="fixedAmount" inputmode="numeric" min="1" step="1" placeholder="70000" required>
+          </label>
+        </div>
+
+        <label>
+          <span>カテゴリ</span>
+          <select id="fixedCategory" required></select>
+        </label>
+
+        <button type="submit" class="primary-button" id="fixedSubmitButton">固定費を追加</button>
+      </form>
+
+      <div class="fixed-total">
+        <span>毎月の固定費合計</span>
+        <strong id="fixedTotal">¥0</strong>
+      </div>
+      <div id="fixedList" class="fixed-list"></div>
+    </section>
+
+    <section class="summary-grid" aria-label="今月の集計">
+      <article class="summary-card income">
+        <span>収入合計</span>
+        <strong id="totalIncome">¥0</strong>
+      </article>
+      <article class="summary-card fixed">
+        <span>固定費合計</span>
+        <strong id="summaryFixedTotal">¥0</strong>
+      </article>
+      <article class="summary-card expense">
+        <span>支出合計</span>
+        <strong id="totalExpense">¥0</strong>
+      </article>
+      <article class="summary-card balance">
+        <span>収支</span>
+        <strong id="monthlyBalance">¥0</strong>
+      </article>
+      <article class="summary-card remaining">
+        <span>残り予算</span>
+        <strong id="remainingBudget">¥0</strong>
+      </article>
+      <article class="summary-card daily">
+        <span>日割り残額</span>
+        <strong id="dailyAllowance">¥0</strong>
+      </article>
+    </section>
+
+    <section class="calendar-panel" aria-labelledby="calendarTitle">
+      <div class="section-heading">
+        <h2 id="calendarTitle">支出カレンダー</h2>
+        <strong id="calendarMonthTotal" class="calendar-total">¥0</strong>
+      </div>
+      <div class="calendar-weekdays" aria-hidden="true">
+        <span>日</span>
+        <span>月</span>
+        <span>火</span>
+        <span>水</span>
+        <span>木</span>
+        <span>金</span>
+        <span>土</span>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+      <div id="dayDetail" class="day-detail"></div>
+    </section>
+
+    <section class="category-panel" aria-labelledby="categoryTitle">
+      <div class="section-heading">
+        <h2 id="categoryTitle">カテゴリ別支出</h2>
+      </div>
+      <div id="categoryList" class="category-list"></div>
+    </section>
+
+    <section class="history-panel" aria-labelledby="historyTitle">
+      <div class="section-heading">
+        <h2 id="historyTitle">入力履歴</h2>
+        <div class="csv-actions">
+          <input type="file" id="csvFileInput" accept=".csv,text/csv">
+          <button type="button" class="secondary-button compact" id="csvImportButton">CSV読込</button>
+          <button type="button" class="secondary-button compact" id="csvButton">CSV出力</button>
+        </div>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
