@@ -35,6 +35,10 @@ const saveBudgetButton = document.getElementById("saveBudgetButton");
 const csvButton = document.getElementById("csvButton");
 const csvImportButton = document.getElementById("csvImportButton");
 const csvFileInput = document.getElementById("csvFileInput");
+const bonusPanel = document.getElementById("bonusPanel");
+const bonusAmountEl = document.getElementById("bonusAmount");
+const bonusMessageEl = document.getElementById("bonusMessage");
+const bonusCloseButton = document.getElementById("bonusCloseButton");
 const fixedCostForm = document.getElementById("fixedCostForm");
 const editingFixedIdInput = document.getElementById("editingFixedId");
 const fixedNameInput = document.getElementById("fixedName");
@@ -92,6 +96,9 @@ function init() {
   csvButton.addEventListener("click", exportCsv);
   csvImportButton.addEventListener("click", () => csvFileInput.click());
   csvFileInput.addEventListener("change", importCsv);
+  bonusCloseButton.addEventListener("click", () => {
+    bonusPanel.hidden = true;
+  });
 }
 
 function handleFormSubmit(event) {
@@ -217,6 +224,7 @@ function render() {
   renderCalendar(monthEntries, month);
   renderFixedCostList();
   renderHistoryList(monthEntries);
+  renderDailyBonus(month, budget);
 }
 
 function renderCategoryList(monthEntries) {
@@ -668,14 +676,44 @@ function getDailyBudgetInfo(month, budget, variableExpense) {
   const [year, monthNumber] = month.split("-").map(Number);
   const daysInMonth = new Date(year, monthNumber, 0).getDate();
   const installments = getDailyBudgetInstallments(month, daysInMonth);
-  const accrued = installments === daysInMonth
-    ? budget
-    : Math.floor((budget * installments) / daysInMonth);
+  const accrued = getAccruedDailyBudget(budget, installments, daysInMonth);
 
   return {
     accrued,
     remaining: accrued - variableExpense,
   };
+}
+
+function renderDailyBonus(month, budget) {
+  const now = new Date();
+  const currentMonth = toMonthValue(now);
+
+  if (!budget || month !== currentMonth) {
+    bonusPanel.hidden = true;
+    return;
+  }
+
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const todayCount = getDailyBudgetInstallments(month, daysInMonth);
+  const yesterdayCount = Math.max(0, todayCount - 1);
+  const todayAdded = getAccruedDailyBudget(budget, todayCount, daysInMonth)
+    - getAccruedDailyBudget(budget, yesterdayCount, daysInMonth);
+
+  if (todayCount <= 0) {
+    bonusAmountEl.textContent = `+${formatYen(getAccruedDailyBudget(budget, 1, daysInMonth))}`;
+    bonusMessageEl.textContent = "朝5時になると今日の日割り予算が追加されます。";
+  } else {
+    bonusAmountEl.textContent = `+${formatYen(todayAdded)}`;
+    bonusMessageEl.textContent = `今日の日割り予算が追加されました。${todayCount}日分まで反映中です。`;
+  }
+
+  bonusPanel.hidden = false;
+}
+
+function getAccruedDailyBudget(budget, installments, daysInMonth) {
+  return installments === daysInMonth
+    ? budget
+    : Math.floor((budget * installments) / daysInMonth);
 }
 
 function getDailyBudgetInstallments(month, daysInMonth) {

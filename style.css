@@ -51,6 +51,35 @@ button {
   margin-bottom: 14px;
 }
 
+.bonus-panel {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+  border: 1px solid #cfe9dc;
+  border-radius: 8px;
+  background: #ecf8f2;
+  box-shadow: var(--shadow);
+  padding: 14px;
+}
+
+.bonus-panel[hidden] {
+  display: none;
+}
+
+.bonus-panel h2 {
+  color: var(--primary);
+  font-size: 1.65rem;
+  line-height: 1.15;
+}
+
+.bonus-panel p:last-child {
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
 .eyebrow {
   margin: 0 0 2px;
   color: var(--primary);
@@ -519,6 +548,10 @@ select:focus {
   .app-header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .bonus-panel {
+    grid-template-columns: 1fr;
   }
 
   .month-picker {
