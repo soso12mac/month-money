@@ -204,7 +204,7 @@ function render() {
   const totalExpense = variableExpense + fixedExpense;
   const balance = totalIncome - totalExpense;
   const budget = Number(budgets[month] || 0);
-  const remaining = budget - totalExpense;
+  const remaining = budget - variableExpense;
   const dailyBudget = getDailyBudgetInfo(month, budget, variableExpense);
 
   totalIncomeEl.textContent = formatYen(totalIncome);
