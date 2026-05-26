@@ -46,6 +46,8 @@ const fixedAmountInput = document.getElementById("fixedAmount");
 const fixedCategoryInput = document.getElementById("fixedCategory");
 const fixedSubmitButton = document.getElementById("fixedSubmitButton");
 const resetFixedButton = document.getElementById("resetFixedButton");
+const viewTabs = document.querySelectorAll(".view-tab");
+const viewSections = document.querySelectorAll(".view-section");
 
 const totalIncomeEl = document.getElementById("totalIncome");
 const totalExpenseEl = document.getElementById("totalExpense");
@@ -80,8 +82,12 @@ function init() {
   updateFixedCategoryOptions();
   loadBudgetForSelectedMonth();
   registerServiceWorker();
+  setActiveView("home");
   render();
 
+  viewTabs.forEach((tab) => {
+    tab.addEventListener("click", () => setActiveView(tab.dataset.targetView));
+  });
   form.addEventListener("submit", handleFormSubmit);
   fixedCostForm.addEventListener("submit", handleFixedCostSubmit);
   entryTypeInput.addEventListener("change", updateCategoryOptions);
@@ -130,6 +136,7 @@ function handleFormSubmit(event) {
   resetForm();
   loadBudgetForSelectedMonth();
   render();
+  setActiveView("home");
 }
 
 function updateCategoryOptions() {
@@ -434,6 +441,7 @@ function handleHistoryAction(event) {
   entryAmountInput.value = entry.amount;
   entryMemoInput.value = entry.memo;
   submitButton.textContent = "更新する";
+  setActiveView("entry");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -457,7 +465,20 @@ function handleFixedCostAction(event) {
   fixedAmountInput.value = fixedCost.amount;
   fixedCategoryInput.value = fixedCost.category;
   fixedSubmitButton.textContent = "固定費を更新";
+  setActiveView("budget");
   document.getElementById("fixedTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function setActiveView(viewName) {
+  viewTabs.forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.targetView === viewName);
+  });
+
+  viewSections.forEach((section) => {
+    section.classList.toggle("view-hidden", section.dataset.view !== viewName);
+  });
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function resetForm() {

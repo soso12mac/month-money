@@ -51,6 +51,39 @@ button {
   margin-bottom: 14px;
 }
 
+.view-nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin: 0 -2px 14px;
+  background: rgba(244, 247, 245, 0.94);
+  padding: 8px 2px;
+  backdrop-filter: blur(10px);
+}
+
+.view-tab {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.view-tab.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+.view-section.view-hidden {
+  display: none;
+}
+
 .bonus-panel {
   display: grid;
   grid-template-columns: 1fr auto;
